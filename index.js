@@ -77,7 +77,7 @@ app.get("/stats", async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-	
+	res.json({"yup": "it works"})
 });
 
 app.get("/global", async (req, res) => {
