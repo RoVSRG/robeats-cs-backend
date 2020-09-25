@@ -218,6 +218,6 @@ app.post("/submitscore", async (req, res) => {
 });
 
 //LISTEN
-app.listen(80, async () => {
-  console.log("Server started listening on port " + 80);
+app.listen(8080, async () => {
+  console.log("Server started listening on port " + 8080);
 });
