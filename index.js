@@ -76,7 +76,9 @@ app.get("/stats", async (req, res) => {
   res.json({})
 });
 
-
+app.get('/', (req, res) => {
+	
+});
 
 app.get("/global", async (req, res) => {
   res.json({});
