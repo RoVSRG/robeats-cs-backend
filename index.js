@@ -4,7 +4,10 @@ const express = require("express");
 var app = express();
 const bodyParser = require("body-parser");
 //CONNECTION STRING
-const uri = "mongodb://robeatscsgame:%24uper%24ecretThing%24@robeatscsgame.com:27017/?authSource=robeatscsdb&readPreference=primary&appname=MongoDB%20Compass&ssl=false";
+
+var useLocalHost = true;
+
+const uri = useLocalHost ? "mongodb://robeatscsgame:%24uper%24ecretThing%24@robeatscsgame.com:27017/?authSource=robeatscsdb&readPreference=primary&appname=MongoDB%20Compass&ssl=false" : "mongodb://localhost:27017";
 //API KEY FOR CLIENTS
 const api_key = null;
 function verifyUser(key_provided) {
@@ -71,6 +74,15 @@ app.get('/', (req, res) => {
 });
 */
 //ENDPOINTS
+
+app.use("/*", (req, res, next) => {
+  var verified = verifyUser(req.get("auth-key"));
+  if (!verified) {
+    res.json({"error": "not authorized"})
+    return;
+  }
+  next();
+})
 
 app.get("/stats", async (req, res) => {
   res.json({})
@@ -158,65 +170,33 @@ app.get("/settings", async (req, res) => {
 });
 
 app.post("/submitscore", async (req, res) => {
-  var verified = verifyUser(req.get("auth-key"));
-  var rating = 0;
-  var rank = 0;
-  if (!verified) {
-    console.log(
-      "Unauthenticated request occured from IP address " +
-        req.ip +
-        " to /submitscore."
-    );
-    res
-      .status(401)
-      .send({"error": "very k00l br00o0o0oo0o0o"});
-  } else {
-    var newPlayData = req.body;
-    console.log(newPlayData);
-    var query = { UserId: newPlayData.UserId, MapId: newPlayData.MapId };
-    // SUBMISSION
-    Plays.findOne(query)
-      .then(async doc => {
-        // submit the score
-        var createNew = doc == null;
-        var shouldOverwrite = false;
-        if ((doc != null) & (newPlayData.Rating >= 0)) {
-          if (doc.Rating != 0) {
-            shouldOverwrite = doc.Rating < newPlayData.Rating;
-          } else {
-            shouldOverwrite = doc.Score < newPlayData.Score;
-          }
-        }
-        console.log(
-          "createNew: " +
-            createNew.toString() +
-            ", shouldOverwrite: " +
-            shouldOverwrite.toString()
-        );
-        if (createNew) {
-          Plays.insertOne(newPlayData);
-        } else if (shouldOverwrite) {
-          Plays.findOneAndReplace(query, newPlayData);
-        }
-      })
-      .catch(async err => {
-        // catch any errors
-        console.log("ERR: " + err);
-        res
-          .status(500)
-          .send(
-            "Whoops! Something went horribly wrong! Here's some info: " + err
-          );
-      })
-      .then(async () => {
-        // send stat data back
-        console.log("end");
-        res.status(200).json({});
-      })
-      .catch(async err => {
-        console.log("ERR: " + err);
-      });
+  var newPlayData = req.body;
+  console.log(newPlayData);
+  var query = { UserId: newPlayData.UserId, MapId: newPlayData.MapId };
+  // SUBMISSION
+  var doc = await Plays.findOne(query)
+      // submit the score
+  var createNew = doc == null;
+  var shouldOverwrite = false;
+  if ((doc != null) & (newPlayData.Rating >= 0)) {
+    if (doc.Rating != 0) {
+      shouldOverwrite = doc.Rating < newPlayData.Rating;
+    } else {
+      shouldOverwrite = doc.Score < newPlayData.Score;
+    }
   }
+  console.log(
+    "createNew: " +
+      createNew.toString() +
+      ", shouldOverwrite: " +
+      shouldOverwrite.toString()
+  );
+  if (createNew) {
+    await Plays.insertOne(newPlayData);
+  } else if (shouldOverwrite) {
+    await Plays.findOneAndReplace(query, newPlayData);
+  }
+  res.status(200).json({});
 });
 
 //LISTEN
