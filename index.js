@@ -4,7 +4,7 @@ const express = require("express");
 var app = express();
 const bodyParser = require("body-parser");
 //CONNECTION STRING
-const uri = "mongodb://localhost:27017";
+const uri = "mongodb://robeatscsgame:%24uper%24ecretThing%24@robeatscsgame.com:27017/?authSource=robeatscsdb&readPreference=primary&appname=MongoDB%20Compass&ssl=false";
 //API KEY FOR CLIENTS
 const api_key = null;
 function verifyUser(key_provided) {
