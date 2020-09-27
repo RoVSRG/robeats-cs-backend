@@ -50,27 +50,51 @@ router.get("/maps/:id", async (req, res) => {
     res.send(results)
 });
 
-/*router.post("/submitscore", async (req, res) => {
-    var newPlayData = req.body;
-    var query = { UserId: newPlayData.UserId, MapId: newPlayData.MapId };
+router.post("/submitscore", async (req, res) => {
+    var body = req.body;
     // SUBMISSION
-    var doc = await Plays.findOne(query)
+    var score = await Play.findOne({ UserId: body.UserId, MapId: body.MapId })
         // submit the score
-    var createNew = doc == null;
+    var createNew = score == null;
     var shouldOverwrite = false;
-    if ((doc != null) & (newPlayData.Rating >= 0)) {
-      if (doc.Rating != 0) {
-        shouldOverwrite = doc.Rating < newPlayData.Rating;
+
+    if ((score != null) & (body.Rating >= 0)) {
+      if (score.Rating != 0) {
+        shouldOverwrite = score.Rating < body.Rating;
       } else {
-        shouldOverwrite = doc.Score < newPlayData.Score;
+        shouldOverwrite = score.Score < body.Score;
       }
     }
+
+    console.log({createNew: createNew, shouldOverwrite: shouldOverwrite, score: score})
+
     if (createNew) {
-      await Play.insertOne(newPlayData);
+      score = new Play({
+        PlayerName: body.PlayerName,
+        UserId: body.UserId,
+        MapId: body.MapId,
+        MapName: body.MapName,
+        Accuracy: body.Accuracy,
+        Score: body.Score,
+        Spread: body.Spread,
+        Rate: body.Rate,
+        Rating: body.Rating
+      })
+      score.save()
     } else if (shouldOverwrite) {
-      await Play.findOneAndReplace(query, newPlayData);
+      score.PlayerName = body.PlayerName
+      score.UserId = body.UserId
+      score.MapId = body.MapId
+      score.MapName = body.MapName
+      score.Accuracy = body.Accuracy
+      score.Score = body.Score
+      score.Spread = body.Spread
+      score.Rate = body.Rate
+      score.Rating = body.Rating
+      score.save()
     }
-    res.status(200).json({});
-});*/
+
+    res.json(score.toJSON())
+});
 
 module.exports = router;
