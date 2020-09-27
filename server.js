@@ -41,6 +41,12 @@ app.use("/*", (req, res, next) => {
   next();
 })
 
+
+app.use(function (req, res, next) {
+  console.log("Request sent!")
+  next();
+})
+
 app.get("/stats", async (req, res) => {
   res.json({})
 });

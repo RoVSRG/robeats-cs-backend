@@ -41,9 +41,6 @@ router.get("/maps/:id", async (req, res) => {
     query.lean();
     query.limit(50);
     const results = await query.exec();
-
-    console.log(results.length)
-
     res.send(results)
 });
 
@@ -93,10 +90,5 @@ router.post("/submitscore", async (req, res) => {
 
     res.json(score.toJSON())
 });
-
-router.use(function (req, res, next) {
-  console.log("Request sent!")
-  next();
-})
 
 module.exports = router;
