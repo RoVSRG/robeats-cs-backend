@@ -3,9 +3,9 @@ var app = express();
 const bodyParser = require("body-parser");
 
 const mongoose = require('mongoose');
-const useLocalHost = true;
+const useLocalHost = false;
 
-const uri = !useLocalHost ? "mongodb://robeatscsgame:%24uper%24ecretThing%24@robeatscsgame.com:27017/robeatscsdb" : "mongodb://localhost:27017/robeatscsdb";
+const uri = "mongodb://robeatscsgame:%24uper%24ecretThing%24@robeatscsgame.com:27017/robeatscsdb";
 
 mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true});
 
