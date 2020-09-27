@@ -29,9 +29,6 @@ router.get("/plays/:id", async (req, res) => {
   query.lean();
   query.limit(50);
   const results = await query.exec();
-
-  console.log(results.length)
-
   res.send(results)
 });
 
