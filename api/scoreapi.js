@@ -1,9 +1,6 @@
 const router = require('express').Router();
 
-const mongoclient = require('../database');
-
-const numberOfGLBSlots = 100;
-const numberOfMLBSlots = 50;
+const Play = require('../models/play');
 
 async function getRating(promise) {
     var rating = 0;
@@ -24,30 +21,36 @@ async function getRating(promise) {
 }
 
 router.get("/plays/:id", async (req, res) => {
-    var params = req.params;
-    var userID = params.id
-    Plays.find({ UserId: userID }).sort({ Rating: -1 }).toArray().then(async doc_r => {
-        res.status(200).json(doc_r);
-    }).catch(err => {
-        console.log("Oh no! A request failed! Here is some info: " + err);
-        res.status(500).json({"error": "Internal Server Error"})
-        return err;
-    });
+  var params = req.params;
+  var userID = params.id
+
+  const query = Play.find({"UserId": userID});
+  query.sort("-Rating");
+  query.lean();
+  query.limit(50);
+  const results = await query.exec();
+
+  console.log(results.length)
+
+  res.send(results)
 });
 
 router.get("/maps/:id", async (req, res) => {
     var params = req.params;
     var mapID = params.id
-    Plays.find({ MapId: mapID }).sort({ Rating: -1 }).limit(numberOfMLBSlots).toArray().then(async doc_r => {
-        res.status(200).json(doc_r);
-    }).catch(err => {
-        console.log("Oh no! A request failed! Here is some info: " + err);
-        res.status(500).json({"error": "Internal Server Error"})
-        return err;
-    });
+
+    const query = Play.find({"MapId": mapID});
+    query.sort("-Rating");
+    query.lean();
+    query.limit(50);
+    const results = await query.exec();
+
+    console.log(results.length)
+
+    res.send(results)
 });
 
-router.post("/submitscore", async (req, res) => {
+/*router.post("/submitscore", async (req, res) => {
     var newPlayData = req.body;
     var query = { UserId: newPlayData.UserId, MapId: newPlayData.MapId };
     // SUBMISSION
@@ -63,11 +66,11 @@ router.post("/submitscore", async (req, res) => {
       }
     }
     if (createNew) {
-      await Plays.insertOne(newPlayData);
+      await Play.insertOne(newPlayData);
     } else if (shouldOverwrite) {
-      await Plays.findOneAndReplace(query, newPlayData);
+      await Play.findOneAndReplace(query, newPlayData);
     }
     res.status(200).json({});
-});
+});*/
 
 module.exports = router;
