@@ -23,9 +23,15 @@ function verifyUser(key_provided) {
   }
 }
 
+// DDOS
+
+const ddos = require("ddos");
+let ddosInst = new ddos({burst:15, limit:25})
+
 // TOP LEVEL APP USES
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ extended: true }));
+app.use(ddosInst.express)
 
 app.use("/*", (req, res, next) => {
   var verified = verifyUser(req.get("auth-key"));
