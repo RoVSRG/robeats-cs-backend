@@ -94,4 +94,9 @@ router.post("/submitscore", async (req, res) => {
     res.json(score.toJSON())
 });
 
+router.use(function (req, res, next) {
+  console.log("Request sent!")
+  next();
+})
+
 module.exports = router;
