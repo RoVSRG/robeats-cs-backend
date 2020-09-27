@@ -11,10 +11,9 @@ mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true});
 
 const apiRouters = require("./api")
 
-const api_key = "";
+const api_key = "HCQVcEs2NZdaMvJhDXJPdbR1l3Wy45h5QdLSZNXtN6ouU";
 
 function verifyUser(key_provided) {
-  return true;
   if (key_provided) {
     if (key_provided == api_key) {
       return true;
