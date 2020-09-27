@@ -3,7 +3,11 @@ var app = express();
 const bodyParser = require("body-parser");
 
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/robeatscsdb', {useNewUrlParser: true, useUnifiedTopology: true});
+const useLocalHost = true;
+
+const uri = !useLocalHost ? "mongodb://robeatscsgame:%24uper%24ecretThing%24@robeatscsgame.com:27017/robeatscsdb" : "mongodb://localhost:27017/robeatscsdb";
+
+mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true});
 
 const apiRouters = require("./api")
 
