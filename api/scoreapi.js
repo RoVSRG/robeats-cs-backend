@@ -20,7 +20,7 @@ async function getRating(promise) {
     return plr_rating;
 }
 
-router.get("/plays/:id", async (req, res) => {
+router.get("/plays/id/:id", async (req, res) => {
   var params = req.params;
   var userID = params.id
 

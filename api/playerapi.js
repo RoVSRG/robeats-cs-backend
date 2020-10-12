@@ -3,7 +3,7 @@ const router = require('express').Router();
 const Profile = require('../models/profile');
 
 
-router.get("/profile/:id", async (req, res) => {
+router.get("/profile/id/:id", async (req, res) => {
   var params = req.params;
   var userID = params.id
 
