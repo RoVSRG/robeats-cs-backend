@@ -66,6 +66,7 @@ app.get("/settings", async (req, res) => {
 // MOUNT ROUTERS
 
 app.use("/api", apiRouters.scoreApi)
+app.use("/api", apiRouters.profileApi)
 
 //LISTEN
 app.listen(8080, async () => {
