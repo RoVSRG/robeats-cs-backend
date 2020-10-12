@@ -32,6 +32,18 @@ router.get("/plays/:id", async (req, res) => {
   res.send(results)
 });
 
+router.get("/plays/:name", async (req, res) => {
+  var params = req.params;
+  var username = params.name
+
+  const query = Play.find({"PlayerName": username});
+  query.sort("-Rating");
+  query.lean();
+  query.limit(50);
+  const results = await query.exec();
+  res.send(results)
+});
+
 router.get("/maps/:id", async (req, res) => {
     var params = req.params;
     var mapID = params.id
