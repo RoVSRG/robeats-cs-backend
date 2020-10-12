@@ -1,4 +1,4 @@
 module.exports = {
-    scoreApi: require("./scoreapi")
+    scoreApi: require("./scoreapi"),
     profileApi: require("./playerapi")
 }
