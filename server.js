@@ -25,7 +25,7 @@ function verifyUser(key_provided) {
 // DDOS
 
 const ddos = require("ddos");
-let ddosInst = new ddos({burst:15, limit:25})
+let ddosInst = new ddos({burst:50, limit:75})
 
 // TOP LEVEL APP USES
 app.use(bodyParser.urlencoded({ extended: true }));
