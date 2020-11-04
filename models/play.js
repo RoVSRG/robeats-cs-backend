@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 
 const playSchema = new mongoose.Schema({
+    _id: String,
     Rating: Number,
     MapName: String,
     Rate: Number,

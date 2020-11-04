@@ -32,6 +32,17 @@ router.get("/plays/id/:id", async (req, res) => {
   res.send(results)
 });
 
+router.get("/plays/:id", async (req, res) => {
+  var params = req.params;
+  var playid = params.id
+
+  const query = Play.find({"_id": playid});
+  query.lean();
+  query.limit(1);
+  const results = await query.exec();
+  res.send(results)
+});
+
 router.get("/plays/:name", async (req, res) => {
   var params = req.params;
   var username = params.name
