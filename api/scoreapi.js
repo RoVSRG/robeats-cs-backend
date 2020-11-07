@@ -67,15 +67,10 @@ router.get("/maps/:id", async (req, res) => {
     res.send(results)
 });
 
-router.post("/deletescore", async (req, res) => {
+router.post("/deletescore/:id", async (req, res) => {
     var params = req.params;
     var playid = params.id
 
-    const query = Play.find({"_id": playid});
-    query.sort("-Rating");
-    query.lean();
-    query.limit(50);
-    const results = await query.exec();
     Play.findByIdAndDelete(playid)
     res.send(results)
 });
