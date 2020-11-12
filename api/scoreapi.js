@@ -32,7 +32,7 @@ router.get("/plays/id/:id", async (req, res) => {
   res.send(results)
 });
 
-router.get("/plays/:id", async (req, res) => {
+router.get("/play/:id", async (req, res) => {
   var params = req.params;
   var playid = params.id
 
