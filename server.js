@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 
 const authInfo = require("./auth.json")
 
-const useLocalDev = true
+const useLocalDev = false
 
 const uri = useLocalDev && authInfo.localDatabaseUri || authInfo.databaseUri;
 
