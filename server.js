@@ -3,15 +3,18 @@ var app = express();
 const bodyParser = require("body-parser");
 
 const mongoose = require('mongoose');
-const useLocalHost = false;
 
-const uri = "mongodb://robeatscsgame:%24uper%24ecretThing%24@robeatscsgame.com:27017/robeatscsdb";
+const authInfo = require("./auth.json")
+
+const useLocalDev = true
+
+const uri = useLocalDev && authInfo.localDatabaseUri || authInfo.databaseUri;
 
 mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true});
 
-const apiRouters = require("./api")
+const apiRouters = require("./routers")
 
-const api_key = "HCQVcEs2NZdaMvJhDXJPdbR1l3Wy45h5QdLSZNXtN6ouU";
+const api_key = authInfo.authKey;
 
 function verifyUser(key_provided) {
   if (key_provided) {
