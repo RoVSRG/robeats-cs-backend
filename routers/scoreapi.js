@@ -1,6 +1,7 @@
 const router = require('express').Router();
 
 const ScoreAPI = require('../api/score')
+const Play = require('../models/play')
 
 router.get("/plays/id/:id", async (req, res) => {
   var params = req.params;
@@ -62,11 +63,9 @@ router.post("/submitscore", async (req, res) => {
     // SUBMISSION
 
     await ScoreAPI.submitScore(body)
-    const rank = await ScoreAPI.updateProfile(body)
+    const data = await ScoreAPI.updateProfile(body)
 
-    res.json({
-      rank: rank
-    })
+    res.json(data)
 });
 
 module.exports = router;

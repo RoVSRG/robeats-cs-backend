@@ -48,7 +48,7 @@ class ScoreAPI {
     }
 
     async updateProfile(data) {
-        const plays = await Play.find({"UserId": data.UserId})
+        const plays = await Play.find({"UserId": data.UserId}).sort("-Rating")
 
         const rating = await PlayerMetrics.getRating(plays)
 
@@ -61,10 +61,16 @@ class ScoreAPI {
             "UserId": data.UserId
         }, {
             new: true,
-            upsert: true
+            upsert: true,
+            useFindAndModify: false
         })
 
-        return await PlayerAPI.getRank(data.UserId)
+        const rank = await PlayerAPI.getRank(data.UserId)
+
+        return {
+            rank: rank,
+            rating: rating
+        }
     }
 }
 
