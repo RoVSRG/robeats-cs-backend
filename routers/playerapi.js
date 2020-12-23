@@ -51,4 +51,9 @@ router.post("/profile/update/:id", async (req, res) => {
   }))
 })
 
+router.get("/global", async (req, res) => {
+  const ranks = await ScoreAPI.getGlobalLeaderboard()
+  res.send(ranks)
+})
+
 module.exports = router;

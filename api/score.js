@@ -77,6 +77,10 @@ class ScoreAPI {
             rating: rating
         }
     }
+
+    async getGlobalLeaderboard() {
+        return await Profile.find().limit(50).sort("-Rating")
+    }
 }
 
 module.exports = new ScoreAPI()
