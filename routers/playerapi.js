@@ -10,14 +10,15 @@ router.get("/profile/id/:id", async (req, res) => {
   var params = req.params;
   var userID = params.id
 
-  const query = Profile.find({"UserId": userID});
+  const query = Profile.findOne({"UserId": userID});
   query.lean();
   query.limit(1);
   const results = await query.exec();
 
-  const rank = await PlayerAPI.getRank(userID)
-
-  results[0].rank = rank
+  if (results != null) {
+    const rank = await PlayerAPI.getRank(userID)
+    results.rank = rank
+  }
 
   res.send(results)
 });
@@ -26,7 +27,7 @@ router.get("/profile/:name", async (req, res) => {
   var params = req.params;
   var username = params.name
 
-  const query = Profile.find({"PlayerName": username});
+  const query = Profile.findOne({"PlayerName": username});
   query.lean();
   query.limit(1);
   const results = await query.exec();
