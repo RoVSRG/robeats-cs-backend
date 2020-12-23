@@ -32,7 +32,7 @@ class ScoreAPI {
                 "Rate": data.Rate,
                 "Rating": data.Rating
             })
-            score.save()
+            await score.save()
         } else if (shouldOverwrite) {
             score.PlayerName = data.PlayerName
             score.UserId = data.UserId
@@ -43,7 +43,7 @@ class ScoreAPI {
             score.Spread = data.Spread
             score.Rate = data.Rate
             score.Rating = data.Rating
-            score.save()
+            await score.save()
         }
     }
 
@@ -52,14 +52,19 @@ class ScoreAPI {
 
         const rating = await PlayerMetrics.getRating(plays)
 
-        await Profile.findOneAndUpdate({"UserId": data.UserId}, {
-            "PlayerName": data.PlayerName,
+        let update = {
             "Rating": rating,
             $inc: {
                 "TotalMapsPlayed": 1
             },
             "UserId": data.UserId
-        }, {
+        }
+
+        if (data.PlayerName) {
+            update.PlayerName = data.PlayerName
+        }
+
+        await Profile.findOneAndUpdate({"UserId": data.UserId}, update, {
             new: true,
             upsert: true,
             useFindAndModify: false
