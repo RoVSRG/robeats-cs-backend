@@ -1,4 +1,6 @@
 const express = require("express");
+const cors = require("cors");
+
 var app = express();
 const bodyParser = require("body-parser");
 
@@ -34,6 +36,7 @@ let ddosInst = new ddos({burst:80, limit:120})
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ extended: true }));
 app.use(ddosInst.express)
+app.use(cors())
 
 app.use("/*", (req, res, next) => {
   var verified = verifyUser(req.get("auth-key"));
