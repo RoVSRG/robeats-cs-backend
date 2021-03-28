@@ -2,6 +2,7 @@ const router = require('express').Router();
 
 const ScoreAPI = require('../api/score')
 const Play = require('../models/play')
+const Profile = require('../models/profile')
 
 router.get("/plays/id/:id", async (req, res) => {
   var params = req.params;
@@ -50,7 +51,17 @@ router.get("/maps/:id", async (req, res) => {
     res.send(results)
 });
 
-router.post("/deletescore/:id", async (req, res) => {
+router.delete("/profile/:name", async (req, res) => {
+  var params = req.params;
+  var name = params.name
+
+  await Profile.deleteOne({PlayerName: name})
+  await Play.deleteMany({PlayerName: name});
+
+  res.status(200).send({status: 200, success: true, message: `Successfully deleted all scores for user ${name}`})
+})
+
+router.delete("/score/:id", async (req, res) => {
     var params = req.params;
     var playid = params.id
 
