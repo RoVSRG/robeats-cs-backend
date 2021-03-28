@@ -55,6 +55,10 @@ router.delete("/profile/:name", async (req, res) => {
   var params = req.params;
   var name = params.name
 
+  if (name == "*") {
+    res.status(400).send({status: 400, success: false, message: "Invalid request"})  
+  }
+
   await Profile.deleteOne({PlayerName: name})
   await Play.deleteMany({PlayerName: name});
 
@@ -64,6 +68,10 @@ router.delete("/profile/:name", async (req, res) => {
 router.delete("/score/:id", async (req, res) => {
     var params = req.params;
     var playid = params.id
+
+    if (playid == "*") {
+      res.status(400).send({status: 400, success: false, message: "Invalid request"})  
+    }
 
     Play.findByIdAndDelete(playid)
     res.send(results)
