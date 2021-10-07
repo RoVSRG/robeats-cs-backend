@@ -18,7 +18,7 @@ const apiRouters = require("./routers")
 
 const api_key = authInfo.authKey;
 
-function verifyUser(key_provided) {
+const verifyUser = (key_provided) => {
   if (key_provided) {
     if (key_provided == api_key) {
       return true;
@@ -47,9 +47,8 @@ app.use("/*", (req, res, next) => {
   next();
 })
 
-
-app.use(function (req, res, next) {
-  console.log("Request sent!")
+app.use((req, res, next) => {
+  console.log("Request sent!");
   next();
 })
 
