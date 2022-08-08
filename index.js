@@ -42,7 +42,7 @@ fastify.register(require("./routes/difficulties"), { prefix: "/api/difficulties"
 //     }
 // })
 
-fastify.listen({ port: process.env.port ? Number.parseInt(process.env.port) : 3000 }, (err, address) => {
+fastify.listen({ port: process.env.rcsport ? Number.parseInt(process.env.rcsport) : 3000 }, (err, address) => {
     if (!err) return;
     fastify.log.error(err)
     process.exit(1)
