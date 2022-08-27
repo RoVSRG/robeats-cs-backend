@@ -1,3 +1,5 @@
+const cors = require("@fastify/cors")
+
 const fastify = require('fastify')({
     logger: true
 })
@@ -38,6 +40,8 @@ fastify.register(require("./routes/profiles"), { prefix: "/api/profiles" })
 fastify.register(require("./routes/bans"), { prefix: "/api/bans" })
 fastify.register(require("./routes/matchmaking"), { prefix: "/api/matchmaking" })
 fastify.register(require("./routes/difficulties"), { prefix: "/api/difficulties" })
+
+fastify.register(cors)
 
 fastify.listen(process.env.rcsport ? Number.parseInt(process.env.rcsport) : 3000, function (err, address) {
     if (err) {

@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/RoVSRG/robeats-cs-backend#readme",
   "dependencies": {
+    "@fastify/cors": "^8.1.0",
     "arpad": "^2.0.0",
     "axios": "^0.27.2",
     "fastify": "^4.3.0",
