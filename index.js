@@ -37,6 +37,8 @@ fastify.register(require("./routes/bans"), { prefix: "/api/bans" })
 fastify.register(require("./routes/matchmaking"), { prefix: "/api/matchmaking" })
 fastify.register(require("./routes/difficulties"), { prefix: "/api/difficulties" })
 
+fastify.register(cors)
+
 // fastify.listen(process.env.port ? Number.parseInt(process.env.port) : 3000, function (err, address) {
 //     if (err) {
 //         fastify.log.error(err)
