@@ -65,6 +65,8 @@ module.exports = (fastify, opts, done) => {
 
         await diff.save()
 
+        await execAsync(`rm ./_maps/${hash}.json`)
+
         await reply.send(difficulties)
     })
 

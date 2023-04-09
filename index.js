@@ -1,4 +1,9 @@
+const fs = require("fs")
 const cors = require("@fastify/cors")
+
+try {
+    fs.mkdirSync("replays")
+} catch {}
 
 const fastify = require('fastify')({
     logger: true

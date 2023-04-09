@@ -1,3 +1,5 @@
+const fs = require("fs")
+
 const Play = require("../models/play")
 const Profile = require("../models/profile")
 
@@ -153,7 +155,8 @@ module.exports = function(fastify, opts, done) {
             SongMD5Hash,
             CountryRegion
         } = request.body
-        
+
+        let pb = false        
         let oldScore = await Play.findOne({ SongMD5Hash: SongMD5Hash, UserId: UserId })
 
         if (oldScore) {
@@ -163,6 +166,8 @@ module.exports = function(fastify, opts, done) {
             }
 
             if (Rating.Overall > oldScore.Rating.Overall || (oldScore.Rating.Overall == 0 && Score > oldScore.Score)) {
+                pb = true
+
                 oldScore.Perfects = Perfects
                 oldScore.Accuracy = Accuracy
                 oldScore.Mean = Mean
@@ -183,6 +188,8 @@ module.exports = function(fastify, opts, done) {
                 await oldScore.save()
             }
         } else {
+            pb = true
+
             const score = new Play({
                 Perfects: Perfects,
                 Accuracy: Accuracy,
@@ -214,7 +221,7 @@ module.exports = function(fastify, opts, done) {
             }
         })
 
-        reply.send({ok: "ok"})
+        reply.send({message: "ok", pb: pb})
     })
 
     fastify.post("/rerate", { preHandler: fastify.protected }, async (request, reply) => {
@@ -234,7 +241,32 @@ module.exports = function(fastify, opts, done) {
             await recalculateUser(element.UserId)
         }
 
-        reply.send({ok: "ok"})
+        reply.send({message: "ok"})
+    })
+
+    fastify.get("/replay", async (request, reply) => {
+        try {
+            let content = fs.readFileSync(`replays/${request.query.hash}_${request.query.userid}.json`)
+
+            reply.send(content)
+        } catch {
+            reply.send({message: "Replay could not be found", success: false})
+        }
+    })
+
+    fastify.post("/replay", async (request, reply) => {
+        let fileContent
+
+        try {
+            fileContent = JSON.stringify(request.body)
+        } catch {
+            reply.send({message: "Body is not valid JSON"})
+            return
+        }
+
+        fs.writeFileSync(`replays/${request.query.hash}_${request.query.userid}.json`, fileContent)
+
+        reply.send({message: "Replay saved"})
     })
 
     fastify.delete("/", { preHandler: fastify.protected }, async (request, reply) => {
