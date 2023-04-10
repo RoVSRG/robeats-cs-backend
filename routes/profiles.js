@@ -18,7 +18,13 @@ module.exports = (fastify, opts, done) => {
     })
 
     fastify.get("/top", { preHandler: fastify.protected }, async (request, reply) => {
-      const players = await Profile.find({ Allowed: true }).sort("-Rating.Overall").limit(100)
+      let query = { Allowed: true }
+
+      if (request.query.country) {
+        query.CountryRegion = request.query.country
+      }
+
+      const players = await Profile.find(query).sort("-Rating.Overall").limit(100)
 
       reply.send(players)
     })
