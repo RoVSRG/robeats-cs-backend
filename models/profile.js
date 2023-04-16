@@ -18,7 +18,12 @@ const schema = new Schema({
     UserId: Number,
     Accuracy: Number,
     CountryRegion: String,
-    Elo: { type: Number, default: 500 },
+    GlickoRating: { type: Number, default: 1500 },
+    RD: { type: Number, default: 350 },
+    Sigma: { type: Number, default: 0.06 },
+    WinStreak: { type: Number, default: 0 },
+    RankedMatchesPlayed: { type: Number, default: 0 },
+    Wins: { type: Number, default: 0 },
     Allowed: Boolean
 }, {
     timestamps: { createdAt: "_created_at", updatedAt: "_updated_at" }

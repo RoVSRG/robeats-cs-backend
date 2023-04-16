@@ -1,20 +1,11 @@
 const { Schema, model } = require("mongoose")
 
 const Difficulty = new Schema({
-    Overall: Number,
-    Chordjack: Number,
-    Handstream: Number,
-    Jack: Number,
-    Jumpstream: Number,
-    Stamina: Number,
-    Stream: Number,
-    Technical: Number,
-    Rate: Number,
-})
-
-const schema = new Schema({
-    Difficulties: [ Difficulty ],
     SongMD5Hash: String,
+    Rate: Number,
+    Rating: Number,
+    RD: Number,
+    Sigma: Number
 })
 
-module.exports = model("Difficulty", schema, "Difficulties")
+module.exports = model("Difficulty", Difficulty, "Difficulties")

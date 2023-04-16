@@ -1,44 +1,81 @@
 const Match = require("../models/match")
 const Profile = require("../models/profile")
+const Difficulty = require("../models/difficulty")
 
-const Elo = require("arpad")
+const { MatchResult, Period, Player, Rating } = require("go-glicko")
+
+const TAU = 0.6
 
 module.exports = (fastify, opts, done) => {
-    const elo = new Elo()
-
     fastify.get("/", (request, reply) => {
         reply.send({})
     })
 
-    fastify.get("/elo", { preHandler: fastify.protected }, (request, reply) => {
-        const player = Number.parseInt(request.query.player)
-        const opponent = Number.parseInt(request.query.opponent)
-
-        let newElo
-
-        if (request.query.condition == "won") {
-            newElo = elo.newRatingIfWon(player, opponent)
-        } else if (request.query.condition == "lost") {
-            newElo = elo.newRatingIfLost(player, opponent)
-        } else if (request.query.condition == "tied") {
-            newElo = elo.newRatingIfTied(player, opponent)
+    fastify.post("/result", async (request, reply) => {
+        if (!request.query.userid || !request.query.hash || !request.query.result || !request.query.rate) {
+            reply.send("Must provide userid, hash, rate, and result")
+            return
         }
 
-        reply.send({ elo: newElo })
-    })
+        const userId = Number.parseInt(request.query.userid)
+        const user = await Profile.findOne({ UserId: userId })
 
-    fastify.post("/match", { preHandler: fastify.protected }, async (request, reply) => {
-        await Match.findOneAndDelete({ UserId: Number.parseInt(request.query.userid) })
+        const rate = Number.parseInt(request.query.rate)
 
-        const profile = await Profile.findOne({ UserId: Number.parseInt(request.query.userid) })
+        const maps = await Difficulty.find({ Rate: request.query.result === "win" ? { $lte: rate } : { $gte: rate }, SongMD5Hash: request.query.hash })
+        const map = request.query.result === "win" ? maps[maps.length - 1] : maps[0]
 
-        const matchRequest = new Match({
-            UserId: Number.parseInt(request.query.userid),
-            PlayerName: request.query.playername,
-            Elo: profile.Elo
+        const period = new Period(TAU)
+
+        // the dummy player is used to calc maps on rates the user didnt play
+        const dummyPlayer = new Player(new Rating(user.GlickoRating, user.RD, user.Sigma))
+        const userPlayer = new Player(new Rating(user.GlickoRating, user.RD, user.Sigma))
+        const mapPlayer = new Player(new Rating(map.Rating, map.RD, map.Sigma))
+
+        period.addPlayer(userPlayer)
+        period.addPlayer(mapPlayer)
+
+        period.addMatch(userPlayer, mapPlayer, request.query.result === "win" ? MatchResult.WIN : MatchResult.LOSS)
+
+        period.Calculate()
+
+        // update user player
+
+        const winstreak = request.query.result === "win" ? Math.max(user.WinStreak, 0) + 1 : Math.min(user.WinStreak, 0) - 1
+
+        await Profile.updateOne({ UserId: userId }, {
+            GlickoRating: userPlayer.Rating().R(),
+            RD: userPlayer.Rating().RD(),
+            Sigma: userPlayer.Rating().Sigma(),
+            $inc: { RankedMatchesPlayed: 1, Wins: request.query.result === "win" ? 1 : 0 },
+            WinStreak: winstreak
         })
 
-        reply.send()
+        // update map players
+        const mapPlayerPeriod = new Period(TAU)
+
+        const mapPlayers = maps.map(m => {
+            return new Player(new Rating(m.Rating, m.RD, m.Sigma))
+        })
+
+        mapPlayers.forEach(m => mapPlayerPeriod.addPlayer(m))
+
+        mapPlayers.forEach(mp => mapPlayerPeriod.addMatch(dummyPlayer, mp, request.query.result === "win" ? MatchResult.WIN : MatchResult.LOSS))
+
+        mapPlayerPeriod.Calculate()
+
+        for (let i = 0; i < maps.length; i++) {
+            const map = maps[i]
+            const mapPlayer = mapPlayers[i]
+
+            await Difficulty.updateOne({ SongMD5Hash: map.SongMD5Hash, Rate: map.Rate }, {
+                Rating: mapPlayer.Rating().R(),
+                RD: mapPlayer.Rating().RD(),
+                Sigma: mapPlayer.Rating().Sigma()
+            })
+        }
+
+        reply.send(await Profile.findOne({ UserId: userId }))
     })
 
     done()
