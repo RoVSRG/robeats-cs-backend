@@ -20,54 +20,54 @@ function serializeHitObjects(hitObjects) {
 
 module.exports = (fastify, opts, done) => {
     fastify.post("/", async (request, reply) => {
-        // const strBody = JSON.stringify(request.body)
+        const strBody = JSON.stringify(request.body)
 
-        // const hash = md5(serializeHitObjects(request.body.HitObjects))
+        const hash = md5(serializeHitObjects(request.body.HitObjects))
 
-        // if (!fs.existsSync(`./songs/${hash}`)) {
-        //     await fs.writeFileSync(`./_maps/${hash}.json`, strBody)
-        // }
+        if (!fs.existsSync(`./songs/${hash}`)) {
+            await fs.writeFileSync(`./_maps/${hash}.json`, strBody)
+        }
 
-        // const difficulty = await Difficulty.findOne({ SongMD5Hash: hash })
+        const difficulty = await Difficulty.findOne({ SongMD5Hash: hash })
 
-        // if (difficulty) {
-        //     await reply.send(difficulty.Difficulties)
-        //     return
-        // }
+        if (difficulty) {
+            await reply.send(difficulty.Difficulties)
+            return
+        }
 
-        // const { stdout, stderr } = await execAsync(`cat ./_maps/${hash}.json | minacalc`)
+        const { stdout, stderr } = await execAsync(`cat ./_maps/${hash}.json | minacalc`)
 
-        // if (stderr) {
-        //     await reply.code(500).send({ error: stderr })
-        //     return
-        // }
+        if (stderr) {
+            await reply.code(500).send({ error: stderr })
+            return
+        }
 
-        // const rawDifficulties = JSON.parse(stdout)
+        const rawDifficulties = JSON.parse(stdout)
 
-        // const difficulties = rawDifficulties.map(difficulty => {
-        //     return {
-        //         Overall: difficulty.overall,
-        //         Chordjack: difficulty.chordjack,
-        //         Handstream: difficulty.handstream,
-        //         Jack: difficulty.jack,
-        //         Jumpstream: difficulty.jumpstream,
-        //         Stamina: difficulty.stamina,
-        //         Stream: difficulty.stream,
-        //         Technical: difficulty.technical,
-        //         Rate: difficulty.rate,
-        //     }
-        // })
+        const difficulties = rawDifficulties.map(difficulty => {
+            return {
+                Overall: difficulty.overall,
+                Chordjack: difficulty.chordjack,
+                Handstream: difficulty.handstream,
+                Jack: difficulty.jack,
+                Jumpstream: difficulty.jumpstream,
+                Stamina: difficulty.stamina,
+                Stream: difficulty.stream,
+                Technical: difficulty.technical,
+                Rate: difficulty.rate,
+            }
+        })
 
-        // const diff = new Difficulty({
-        //     SongMD5Hash: hash,
-        //     Difficulties: difficulties,
-        // })
+        const diff = new Difficulty({
+            SongMD5Hash: hash,
+            Difficulties: difficulties,
+        })
 
-        // await diff.save()
+        await diff.save()
 
-        // await execAsync(`rm ./_maps/${hash}.json`)
+        await execAsync(`rm ./_maps/${hash}.json`)
 
-        // await reply.send(difficulties)
+        await reply.send(difficulties)
 
         reply.send("Endpoint under maintenance!")
     })
