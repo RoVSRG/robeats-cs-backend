@@ -29,11 +29,12 @@ module.exports = (fastify, opts, done) => {
         const results = await Difficulty.aggregate([
             { $project: { diff: sort, doc: "$$ROOT" } },
             { $sort: { diff: 1 } },
-            { $limit: 1 }
+            { $limit: 30 }
         ]);
-          
 
-        reply.send(results[0].doc)
+        let documents = results.map(r => r.doc)
+
+        reply.send(documents)
     })
 
     fastify.post("/", { preHandler: fastify.protected }, async (request, reply) => {

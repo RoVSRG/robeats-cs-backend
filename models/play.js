@@ -14,7 +14,7 @@ const Rating = new Schema({
 const schema = new Schema({
     Bads: Number,
     Rating: Rating,
-    Mean: Number,
+    Mean: { type: Number, default: 0 },
     Perfects: Number,
     Rate: Number,
     Greats: Number,
