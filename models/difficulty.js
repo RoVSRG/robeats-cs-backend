@@ -5,7 +5,8 @@ const Difficulty = new Schema({
     Rate: Number,
     Rating: Number,
     RD: Number,
-    Sigma: Number
+    Sigma: Number,
+    Allowed: { type: Boolean, default: true }
 })
 
 module.exports = model("Difficulty", Difficulty, "Difficulties")

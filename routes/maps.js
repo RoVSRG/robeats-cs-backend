@@ -41,8 +41,10 @@ module.exports = (fastify, opts, done) => {
         reply.send("Not implemented!")
     })
 
-    fastify.delete("/", { preHandler: fastify.protected }, async (request, reply) => {
-        reply.send("Not implemented!")
+    fastify.delete("/difficulty", { preHandler: fastify.protected }, async (request, reply) => {
+        const result = await Difficulty.deleteMany({ SongMD5Hash: request.query.hash })
+
+        reply.send(`${result.deletedCount} maps deleted`)
     })
 
     done()

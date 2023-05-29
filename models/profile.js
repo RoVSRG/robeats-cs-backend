@@ -1,3 +1,7 @@
+const { difficultyToMMR } = require("../utils")
+
+const DEFAULT_MMR = 1500
+
 const { Schema, model } = require("mongoose")
 
 const Rating = new Schema({
@@ -18,7 +22,15 @@ const schema = new Schema({
     UserId: Number,
     Accuracy: Number,
     CountryRegion: String,
-    GlickoRating: { type: Number, default: 1500 },
+    GlickoRating: { type: Number, default: function() {
+        if (this.TotalMapsPlayed < 20) {
+            return DEFAULT_MMR
+        } else {
+            const rawMMR = difficultyToMMR(this.Rating.Overall)
+
+            return DEFAULT_MMR + (rawMMR - DEFAULT_MMR) * 0.75
+        }
+    } },
     RD: { type: Number, default: 350 },
     Sigma: { type: Number, default: 0.06 },
     WinStreak: { type: Number, default: 0 },
