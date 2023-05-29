@@ -24,7 +24,7 @@ module.exports = (fastify, opts, done) => {
         query.CountryRegion = request.query.country
       }
 
-      const players = await Profile.find(query).sort("-Rating.Overall").limit(100)
+      const players = await Profile.find(query).sort("-GlickoRating").limit(100)
 
       reply.send(players)
     })
