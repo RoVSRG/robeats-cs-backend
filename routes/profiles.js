@@ -9,7 +9,7 @@ module.exports = (fastify, opts, done) => {
           return
         }
 
-        const rank = profile ? (await Profile.countDocuments({ "Rating.Overall": { $gt: profile.Rating.Overall }, "Allowed": true })) + 1 : undefined
+        const rank = profile ? (await Profile.countDocuments({ "GlickoRating": { $gt: profile.GlickoRating }, "Allowed": true })) + 1 : undefined
 
         reply.send({
           Rank: rank,
