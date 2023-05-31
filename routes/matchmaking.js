@@ -2,6 +2,8 @@ const Match = require("../models/match")
 const Profile = require("../models/profile")
 const Difficulty = require("../models/difficulty")
 
+const axios = require("axios")
+
 const { MatchResult, Period, Player, Rating } = require("go-glicko")
 
 const TAU = 0.6
@@ -12,13 +14,25 @@ module.exports = (fastify, opts, done) => {
     })
 
     fastify.post("/result", async (request, reply) => {
-        if (!request.query.userid || !request.query.hash || !request.query.result || !request.query.rate) {
-            reply.send("Must provide userid, hash, rate, and result")
+        if (!request.query.userid || !request.query.hash || !request.query.result || !request.query.rate || !request.query.countrycode) {
+            reply.send("Must provide userid, hash, rate, country code, and result")
             return
         }
 
         const userId = Number.parseInt(request.query.userid)
-        const user = await Profile.findOne({ UserId: userId })
+        let user = await Profile.findOne({ UserId: userId })
+
+        if (!user) {
+            const { data } = await axios.get(`https://users.roblox.com/v1/users/${request.query.userid}`)
+
+            user = new Profile({
+                PlayerName: data.name,
+                UserId: userId,
+                CountryRegion: request.query.countrycode
+            })
+
+            await user.save()
+        }
 
         const rate = Number.parseInt(request.query.rate)
 

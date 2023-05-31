@@ -4,7 +4,7 @@ module.exports = (fastify, opts, done) => {
     fastify.get("/", { preHandler: fastify.protected }, async (request, reply) => {
         const profile = await Profile.findOne({ "UserId": Number.parseInt(request.query.userid) })
 
-        if (!profile?.Rating) {
+        if (!profile) {
           reply.code(404).send({ error: "Profile not found" })
           return
         }

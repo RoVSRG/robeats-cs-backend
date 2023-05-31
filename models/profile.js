@@ -5,25 +5,25 @@ const DEFAULT_MMR = 1500
 const { Schema, model } = require("mongoose")
 
 const Rating = new Schema({
-    Overall: Number,
-    Chordjack: Number,
-    Handstream: Number,
-    Jack: Number,
-    Jumpstream: Number,
-    Stamina: Number,
-    Stream: Number,
-    Technical: Number,
+    Overall: { type: Number, default: 0 },
+    Chordjack: { type: Number, default: 0 },
+    Handstream: { type: Number, default: 0 },
+    Jack: { type: Number, default: 0 },
+    Jumpstream: { type: Number, default: 0 },
+    Stamina: { type: Number, default: 0 },
+    Stream: { type: Number, default: 0 },
+    Technical: { type: Number, default: 0 },
 })
 
 const schema = new Schema({
-    TotalMapsPlayed: Number,
+    TotalMapsPlayed: { type: Number, default: 0 },
     Rating: Rating,
     PlayerName: String,
     UserId: Number,
-    Accuracy: Number,
+    Accuracy: { type: Number, default: 0 },
     CountryRegion: String,
     GlickoRating: { type: Number, default: function() {
-        if (this.TotalMapsPlayed < 20) {
+        if (this.TotalMapsPlayed < 20 || !this.Rating) {
             return DEFAULT_MMR
         } else {
             const rawMMR = difficultyToMMR(this.Rating.Overall)
@@ -36,7 +36,7 @@ const schema = new Schema({
     WinStreak: { type: Number, default: 0 },
     RankedMatchesPlayed: { type: Number, default: 0 },
     Wins: { type: Number, default: 0 },
-    Allowed: Boolean
+    Allowed: { type: Boolean, default: true }
 }, {
     timestamps: { createdAt: "_created_at", updatedAt: "_updated_at" }
 })
