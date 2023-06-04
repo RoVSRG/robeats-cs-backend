@@ -13,28 +13,41 @@ module.exports = (fastify, opts, done) => {
     })
 
     fastify.get("/difficulty", async (request, reply) => {
-        const closest = request.query.closest
+        const closest = request.query.closest;
 
         if (!closest) {
-            reply.send({ error: "No MMR specified" })
-            return
+            reply.send({ error: "No MMR specified" });
+            return;
         }
 
         const sort = {
             $abs: {
-                $subtract: [ Number.parseFloat(closest), "$Rating" ]
-            }
-        }
+                $subtract: [Number.parseFloat(closest), "$Rating"],
+            },
+        };
 
         const results = await Difficulty.aggregate([
-            { $project: { diff: sort, doc: "$$ROOT" } },
+            {
+                $match: {
+                    Rate: { $ne: null },
+                    Rating: { $ne: null },
+                    RD: { $ne: null },
+                    Sigma: { $ne: null },
+                }
+            },
+            {
+                $project: {
+                    diff: sort,
+                    doc: "$$ROOT",
+                },
+            },
             { $sort: { diff: 1 } },
-            { $limit: 30 }
+            { $limit: 30 },
+            { $replaceRoot: { newRoot: "$doc" } }, // Include all fields from the original documents
         ]);
 
-        let documents = results.map(r => r.doc)
+        reply.send(results);
 
-        reply.send(documents)
     })
 
     fastify.post("/", { preHandler: fastify.protected }, async (request, reply) => {
