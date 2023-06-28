@@ -9,7 +9,7 @@ module.exports = (fastify, opts, done) => {
           return
         }
 
-        const rank = profile ? (await Profile.countDocuments({ "GlickoRating": { $gt: profile.GlickoRating }, "Allowed": true })) + 1 : undefined
+        const rank = profile ? (await Profile.countDocuments({ "GlickoRating": { $gt: profile.GlickoRating }, "Allowed": true, "RankedMatchesPlayed": { $gte: 10 } })) + 1 : undefined
 
         reply.send({
           Rank: rank,
@@ -18,7 +18,10 @@ module.exports = (fastify, opts, done) => {
     })
 
     fastify.get("/top", { preHandler: fastify.protected }, async (request, reply) => {
-      let query = { Allowed: true }
+      let query = {
+        Allowed: true,
+        RankedMatchesPlayed: { $gte: 10 }
+      }
 
       if (request.query.country) {
         query.CountryRegion = request.query.country

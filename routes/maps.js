@@ -3,13 +3,14 @@ const Difficulty = require("../models/difficulty")
 
 module.exports = (fastify, opts, done) => {
     fastify.get("/", { preHandler: fastify.protected }, async (request, reply) => {
-        const { hash, page } = request.query
+        const { hash } = request.query
 
-        if (hash) {
-            reply.send(await Map.findOne({ AudioMD5Hash: hash }))
-        } else if (page) {
-            reply.send(await Map.find({}).limit(50).skip(50 * (page - 1)))
-        }
+        if (!hash)
+            reply.status(400).send({ error: "Must provide hash" })
+
+        const difficulties = await Difficulty.find({ SongMD5Hash: hash }, { Allowed: 0, SongMD5Hash: 0, _id: 0 }).sort("Rate")
+
+        reply.send(difficulties)
     })
 
     fastify.get("/difficulty", async (request, reply) => {
@@ -42,7 +43,7 @@ module.exports = (fastify, opts, done) => {
                 },
             },
             { $sort: { diff: 1 } },
-            { $limit: 30 },
+            { $limit: 150 },
             { $replaceRoot: { newRoot: "$doc" } }, // Include all fields from the original documents
         ]);
 
