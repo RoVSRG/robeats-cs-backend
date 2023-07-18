@@ -43,7 +43,7 @@ module.exports = (fastify, opts, done) => {
                 },
             },
             { $sort: { diff: 1 } },
-            { $limit: 150 },
+            { $limit: 50 },
             { $replaceRoot: { newRoot: "$doc" } }, // Include all fields from the original documents
         ]);
 
