@@ -9,6 +9,12 @@ const Profile = require("../models/profile")
 // elseif x >= 75 then return 0.5*x - 37.5
 // else return 0 end
 
+const { Storage } = require('@google-cloud/storage');
+
+const storageClient = new Storage({ "projectId": "RoBeats CS" })
+
+const BUCKET_NAME = "robeats-cs-replays"
+
 const weightPercentage = (value) => {
     if (value === 100)
         return 110;
@@ -246,9 +252,13 @@ module.exports = function(fastify, opts, done) {
 
     fastify.get("/replay", async (request, reply) => {
         try {
-            let content = fs.readFileSync(`replays/${request.query.hash}_${request.query.userid}.json`)
+            const fileName = `${request.query.hash}_${request.query.userid}.json`
 
-            reply.send(content)
+            let [ data ] = await storageClient.bucket(BUCKET_NAME).file(fileName).download({
+                validation: false
+            })
+
+            reply.send(JSON.parse(data.toString()))
         } catch {
             reply.send({message: "Replay could not be found", success: false})
         }
@@ -264,7 +274,14 @@ module.exports = function(fastify, opts, done) {
             return
         }
 
-        fs.writeFileSync(`replays/${request.query.hash}_${request.query.userid}.json`, fileContent)
+        const fileName = `${request.query.hash}_${request.query.userid}.json`
+        const fileDirectory = `replays/${fileName}`
+
+        fs.writeFileSync(fileDirectory, fileContent)
+
+        await storageClient.bucket(BUCKET_NAME).upload(fileDirectory)
+
+        fs.rmSync(fileDirectory)
 
         reply.send({message: "Replay saved"})
     })
